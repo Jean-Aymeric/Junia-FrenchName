@@ -1,4 +1,4 @@
 package com.jad.model.entity;
 
-public class FirstNames {
+public class FirstNames extends Entities<FirstName> {
 }

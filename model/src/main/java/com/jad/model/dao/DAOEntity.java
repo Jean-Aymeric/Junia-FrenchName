@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class DAOEntity<E extends IEntity, Es extends IEntities<E>> {
-    private final Connection connection;
+    protected final Connection connection;
     private final String findByIdProcedureName;
     private final String findAllProcedureName;
     private final String deleteByIdProcedureName;
@@ -38,10 +38,14 @@ public abstract class DAOEntity<E extends IEntity, Es extends IEntities<E>> {
         final CallableStatement call = this.connection.prepareCall(this.findByIdProcedureName);
         call.setInt(1, id);
         call.execute();
-        return this.resultSetToEntity(call.getResultSet());
+        final ResultSet resultSet = call.getResultSet();
+        if (!resultSet.next()) {
+            return null;
+        }
+        return this.resultSetToEntity(resultSet);
     }
 
-    protected abstract E resultSetToEntity(final ResultSet resultSet);
+    protected abstract E resultSetToEntity(final ResultSet resultSet) throws SQLException;
 
     public final Es getAll(final Es entities) throws SQLException {
         final CallableStatement call = this.connection.prepareCall(this.findAllProcedureName);
